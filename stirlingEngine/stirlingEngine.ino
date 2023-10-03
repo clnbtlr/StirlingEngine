@@ -5,8 +5,9 @@ Using Arduino Micro as MCB as sensors require 5V.
 */
 
 #include <SPI.h>
-
+#include "ak7451.h"
 #define CS 10
+AK7451  ak7451;
 
 void setup() {
   Serial.begin(115200);
@@ -19,8 +20,6 @@ void setup() {
   SPI.begin();
 
 }
-//const byte opcode = 0b1001; // AK7451 operation code for read the angle data
-//byte opcode = 0b0101; // AK7451 operation code for change mode
 
 void loop() {
   uint8_t reg = 0x00; // register R_ANG

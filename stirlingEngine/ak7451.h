@@ -63,6 +63,7 @@ class AK7451
   void begin(int8_t chipSelectPin, SPIClass &spiPort = SPI);
   uint16_t read_data(uint8_t opcode, uint8_t reg);
   float read_angle_data();
+  bool read_error_pin();
 
  private:
   uint8_t _cs;

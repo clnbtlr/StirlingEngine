@@ -3,7 +3,6 @@
 */
 #include "ak7451.h"
 
-#define CS 10 // chip select pin
 AK7451  ak7451;
 
 void setup() {
@@ -12,11 +11,13 @@ void setup() {
     delay(1);
   }
   Serial.println("***Reset***");
-  ak7451.begin(CS);
+  ak7451.begin(SS);
 }
 
 void loop() {
   float angle = ak7451.read_angle_data();
-  Serial.println(angle);
+  Serial.print(angle);
+  bool err_pin = ak7451.read_error_pin();
+  Serial.print(", ");Serial.println(err_pin);
   delay(1000);
 }

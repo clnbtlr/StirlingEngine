@@ -80,3 +80,14 @@ float AK7451::read_angle_data()
 
   return angle;
 }
+
+bool AK7451::read_error_pin()
+{
+  // E bit is 1 if Normal
+  // E bit is 0 if Abnormal
+  raw_angle = read_data(OPCODE_READ_ANGLE, REG_ANG);
+  raw_angle >>= 12; // remove last 12 bits
+  raw_angle &= 0x01; // remove first 3 bits
+
+  return raw_angle;
+}

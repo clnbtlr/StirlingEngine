@@ -2,11 +2,18 @@
 CButler. Oct 2023.
 
 Using Arduino Micro as MCB as sensors require 5V.
+Pinout:
+  AK7451:
+  5V <-> 5V
+  GND <-> GND
+  SCK <-> SCK
+  MI <-> SDO
+  MO <-> SDI
+  CS <-> SS
 */
 
 #include <SPI.h>
 #include "ak7451.h"
-#define CS 10
 AK7451  ak7451;
 
 void setup() {
@@ -15,10 +22,9 @@ void setup() {
     delay(1);
   }
   Serial.println("***Reset***");
-  pinMode(CS, OUTPUT);
-  digitalWrite(CS, HIGH); // disable Chip Select
+  pinMode(SS, OUTPUT);
+  digitalWrite(SS, HIGH); // disable Chip Select
   SPI.begin();
-
 }
 
 void loop() {
@@ -33,11 +39,11 @@ void loop() {
   Serial.println(tx_buf, BIN);
 
   SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE2));
-  digitalWrite(CS, LOW); // enable Chip Select
+  digitalWrite(SS, LOW); // enable Chip Select
   SPI.transfer(tx_buf); 
   rx_buf[0] = SPI.transfer(0);
   rx_buf[1] = SPI.transfer(0);
-  digitalWrite(CS, HIGH); // disable Chip Select
+  digitalWrite(SS, HIGH); // disable Chip Select
   SPI.endTransaction();
 
   raw_data = rx_buf[0];
@@ -51,9 +57,9 @@ void loop() {
 
   // // Change Mode
   // SPI.beginTransaction(SPISettings(5000000, MSBFIRST, SPI_MODE3));
-  // digitalWrite(CS, LOW); // enable Chip Select
+  // digitalWrite(SS, LOW); // enable Chip Select
   // SPI.transfer16(0x050F);
-  // digitalWrite(CS, HIGH);
+  // digitalWrite(SS, HIGH);
   // SPI.endTransaction();
   // delay(1000);
 }

@@ -1,6 +1,6 @@
 /***************************************************************************
 * File Name: ak7451.cpp
-* Processor/Platform: Arduino Uno R3 (tested)
+* Processor/Platform: Arduino Uno R3 (tested), Arduino Micro (tested)
 * Development Environment: Arduino 2.2.1
 *
 * Designed for use with with AK7451 magnetic angle sensor IC

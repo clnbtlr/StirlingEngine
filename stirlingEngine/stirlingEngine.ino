@@ -9,7 +9,7 @@ Pinout:
   SCK <-> SCK
   MI <-> SDO
   MO <-> SDI
-  CS <-> SS
+  SS <-> CS
 */
 
 #include <SPI.h>

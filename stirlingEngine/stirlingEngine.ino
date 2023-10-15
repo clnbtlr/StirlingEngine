@@ -24,7 +24,7 @@ AK7451  ak7451;
 int pressurePin = A5; // analog input pin for the pressure sensor
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(19200);
   while(!Serial){ // wait for serial port
     delay(1);
   }
@@ -38,10 +38,9 @@ void loop() {
   float pressure = analogRead(pressurePin)*supply/1024.0; // read bits from MPXV7025 sensor and convert to voltage 
   pressure = (pressure/supply-0.5)/0.018; // convert V to kPa (see datasheet p.5 for transfer function)
   
-  Serial.print(angle); // print angle to Serial Monitor
-  Serial.print(","); // print angle to Serial Monitor
-  Serial.println(pressure);
-  delay(1000); // delay 1 second between measurements 
+  Serial.print("angle:"); Serial.print(angle); Serial.print(",");// print angle to Serial Monitor
+  Serial.print("pressure:");Serial.println(pressure);
+  delay(100); // delay 1 second between measurements 
 }
 
 long readVcc() { // Read supply voltage to improve ADC precision from https://github.com/SensorsIot/ADC_Test.git

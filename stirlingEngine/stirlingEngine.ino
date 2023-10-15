@@ -21,7 +21,11 @@ Pinout:
 #include "ak7451.h"
 AK7451  ak7451;
 
-int pressurePin = A5; // analog input pin for the pressure sensor
+int r = 4; // offset distance between axis and crank [mm]
+int L = 40; // crank arm length [mm]
+float A = PI/4.0*sq(16.0); // piston cross sectional area [mm2]
+float zeroPos = 237.0; // angle reading corresponding to highest point of piston [deg]
+int pressurePin = A5; // analog input pin for pressure sensor
 
 void setup() {
   Serial.begin(19200);
@@ -33,14 +37,17 @@ void setup() {
 }
 
 void loop() {
-  float supply = readVcc() / 1000.0; // read Vcc supply
+  float supply = readVcc()/1000.0; // read Vcc supply
   float angle = ak7451.readAngle(); // read angle from AK7451 sensor
+  angle = fmodf(angle-zeroPos,360.0); // removes zeroPos from measured angle and wraps to 360 deg using modulo function
   float pressure = analogRead(pressurePin)*supply/1024.0; // read bits from MPXV7025 sensor and convert to voltage 
   pressure = (pressure/supply-0.5)/0.018; // convert V to kPa (see datasheet p.5 for transfer function)
-  
-  Serial.print("angle:"); Serial.print(angle); Serial.print(",");// print angle to Serial Monitor
-  Serial.print("pressure:");Serial.println(pressure);
-  delay(100); // delay 1 second between measurements 
+  float h = r*(cos(deg2rad(angle))-L/r*(sqrt(1-(r/L*sq(sin(deg2rad(angle)))))-1)); // change in piston height (see Lu paper, eq.2)
+  float volume = A*h/1000.0; // volume change [cm3]
+  //Serial.print("angle:"); Serial.print(angle); Serial.print(",");// print angle to Serial Monitor
+  Serial.print("pressure:");Serial.print(pressure); Serial.print(",");// print pressure to Serial Monitor
+  Serial.print("volume:");Serial.println(volume); // print volume to Serial Monitor
+  delay(10); // delay between measurements (Lu paper used 200 samples/sec)
 }
 
 long readVcc() { // Read supply voltage to improve ADC precision from https://github.com/SensorsIot/ADC_Test.git
@@ -62,4 +69,9 @@ long readVcc() { // Read supply voltage to improve ADC precision from https://gi
   result |= ADCH << 8;
   result = 1126400L / result; // Calculate Vcc (in mV); 1126400 = 1.1*1024*1000
   return result;
+}
+
+float deg2rad(float angle){ // convert degrees to radians
+  float rad = angle*PI/180.0;
+  return(rad);
 }

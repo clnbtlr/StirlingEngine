@@ -10,56 +10,35 @@ Pinout:
   MI <-> SDO
   MO <-> SDI
   SS <-> CS
+
+  MPXV7025GC6U:
+  5V <-> VS
+  GND <-> GND
+  A6 <-> VOUT
 */
 
 #include <SPI.h>
 #include "ak7451.h"
 AK7451  ak7451;
 
+int pressurePin = A5; // analog input pin for the pressure sensor
+
 void setup() {
   Serial.begin(115200);
-  while(!Serial){
+  while(!Serial){ // wait for serial port
     delay(1);
   }
   Serial.println("***Reset***");
-  pinMode(SS, OUTPUT);
-  digitalWrite(SS, HIGH); // disable Chip Select
-  SPI.begin();
+  ak7451.begin(SS); // SS pin on Arduino Micro but can be any other Digital I/O Pin
 }
 
 void loop() {
-  uint8_t reg = 0x00; // register R_ANG
-  uint8_t opcode = 0x09; // opcode READ_ANGLE
-
-  uint8_t tx_buf = 0;
-  uint8_t rx_buf[2] = {0,0};
-  uint16_t raw_data = 0;
-  reg <<= 1; // register address is 7 bits
-  tx_buf = ( opcode << 4 ) | ( reg >> 4 );
-  Serial.println(tx_buf, BIN);
-
-  SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE2));
-  digitalWrite(SS, LOW); // enable Chip Select
-  SPI.transfer(tx_buf); 
-  rx_buf[0] = SPI.transfer(0);
-  rx_buf[1] = SPI.transfer(0);
-  digitalWrite(SS, HIGH); // disable Chip Select
-  SPI.endTransaction();
-
-  raw_data = rx_buf[0];
-  raw_data <<=8;
-  raw_data |= rx_buf[1];
-  raw_data &= 0x0FFF; // angle data is 12 bits
-  Serial.print((uint16_t)raw_data, BIN);
-  float angle = (360*(float)raw_data)/4096;
-  Serial.print(", ");Serial.println(angle);
-  delay(1000);
-
-  // // Change Mode
-  // SPI.beginTransaction(SPISettings(5000000, MSBFIRST, SPI_MODE3));
-  // digitalWrite(SS, LOW); // enable Chip Select
-  // SPI.transfer16(0x050F);
-  // digitalWrite(SS, HIGH);
-  // SPI.endTransaction();
-  // delay(1000);
+  float angle = ak7451.readAngle(); // read angle from AK7451 sensor
+  float pressure = analogRead(pressurePin)*5.0/1024; // read bits from MPXV7025 sensor and convert to voltage 
+  //pressure = (pressure/5.0-0.5)/0.018; // convert V to kPa (see datasheet p.5 for transfer function)
+  
+  Serial.print(angle); // print angle to Serial Monitor
+  Serial.print(","); // print angle to Serial Monitor
+  Serial.println(pressure);
+  delay(1000); // delay 1 second between measurements 
 }

@@ -14,7 +14,7 @@ Pinout:
   MPXV7025GC6U:
   5V <-> VS
   GND <-> GND
-  A6 <-> VOUT
+  A5 <-> VOUT
 */
 
 #include <SPI.h>

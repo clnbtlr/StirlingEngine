@@ -40,13 +40,13 @@ void loop() {
   float supply = readVcc()/1000.0; // read Vcc supply
   float angle = ak7451.readAngle(); // read angle from AK7451 sensor
   angle = fmodf(angle-zeroPos,360.0); // removes zeroPos from measured angle and wraps to 360 deg using modulo function
-  float pressure = analogRead(pressurePin)*supply/1024.0; // read bits from MPXV7025 sensor and convert to voltage 
-  pressure = (pressure/supply-0.5)/0.018; // convert V to kPa (see datasheet p.5 for transfer function)
+  float pressure = analogRead(pressurePin)*supply/1024.0; // read bits from pressure sensor and convert to voltage 
+  pressure = (pressure/supply-0.5)/0.2; // convert V to kPa (see MPXV7002 datasheet p.6 for transfer function)
   float h = r*(cos(deg2rad(angle))-L/r*(sqrt(1-(r/L*sq(sin(deg2rad(angle)))))-1)); // change in piston height (see Lu paper, eq.2)
   float volume = A*h/1000.0; // volume change [cm3]
   //Serial.print("angle:"); Serial.print(angle); Serial.print(",");// print angle to Serial Monitor
-  Serial.print("pressure:");Serial.print(pressure); Serial.print(",");// print pressure to Serial Monitor
-  Serial.print("volume:");Serial.println(volume); // print volume to Serial Monitor
+  Serial.print("pressure:");Serial.print(pressure,3); Serial.print(",");// print pressure to Serial Monitor
+  Serial.print("volume:");Serial.println(volume,3); // print volume to Serial Monitor
   delay(10); // delay between measurements (Lu paper used 200 samples/sec)
 }
 

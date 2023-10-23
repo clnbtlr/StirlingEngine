@@ -1,5 +1,5 @@
 clear;
-% close all
+close all
 
 %% Read serial data from Arduino Micro
 % https://uk.mathworks.com/help/instrument/read-streaming-data-from-arduino.html
@@ -9,12 +9,15 @@ clear;
 % flush(arduinoObj);
 % arduinoObj.UserData = struct("P",[],"V",[],"Count",1);
 % configureCallback(arduinoObj,"terminator",@readData);
+% % save arduinoData1.mat Pmeas Vmeas
 
-load arduinoData.mat
+load arduinoData.mat % values from MPXV7002
 figure; hold on;
 plot(Pmeas,'-m')
 plot(Vmeas,'-b')
-Pmeas = Pmeas*1000 + 101325; % pressure values from arduino [Pa]
+legend('Pressure','Volume')
+load arduinoData1.mat % values from PSE533
+Pmeas = Pmeas*1000 + 101000; % pressure values from arduino [Pa]
 
 %% calculate ideal Stirling cycle
 
@@ -39,7 +42,7 @@ v2 = v1 + pi/4*d^2*h; % [m3]
 % position, pressure and temperature will be at atmospheric. Can then use
 % the reference specfic volume at that point to caluclate mass of air
 % inside when resealed at these conditions.
-m = 101325*(v1)/R/(20+273.15);
+m = 101000*(v1)/R/(20+273.15);
 V1 = v1/m; % specific volume at V1 [m3/kg]
 V2 = v2/m; % specific volume at V2 [m3/kg]
 Vmeas = ((Vmeas*1e-6) + v1 + 0.5*pi/4*d^2*h)/m; % pressure values from arduino [m3/kg]
@@ -65,35 +68,38 @@ Pc = (P4*V4^n)./V.^n;
 % nothing to calculate as know all values already.
 
 figure; hold on;
-plot(Vmeas,Pmeas,'-g')
+plot(Vmeas,Pmeas/1000,'-g')
+xlabel('Volume [m^3/kg]')
+ylabel('Pressure [kPa]')
+axis('padded');
 
 figure; hold on; box on;
-plot(V,Ph,'r')
-plot([V2,V3],[P2,P3],'-ok','MarkerFaceColor','k')
-plot(V,Pc,'-b')
-plot([V4,V1],[P4,P1],'-ok','MarkerFaceColor','k')
+plot(V,Ph/1000,'r')
+plot([V2,V3],[P2,P3]/1000,'-ok','MarkerFaceColor','k')
+plot(V,Pc/1000,'-b')
+plot([V4,V1],[P4,P1]/1000,'-ok','MarkerFaceColor','k')
 % arrows
-plot(V(N/2),Ph(N/2),'>r','MarkerFaceColor','r')
-plot(V2,(P2+P3)/2,'vk','MarkerFaceColor','k')
-plot(V(N/2),Pc(N/2),'<b','MarkerFaceColor','b')
-plot(V1,(P1+P4)/2,'^k','MarkerFaceColor','k')
+plot(V(N/2),Ph(N/2)/1000,'>r','MarkerFaceColor','r')
+plot(V2,(P2+P3)/2/1000,'vk','MarkerFaceColor','k')
+plot(V(N/2),Pc(N/2)/1000,'<b','MarkerFaceColor','b')
+plot(V1,(P1+P4)/2/1000,'^k','MarkerFaceColor','k')
 % isotherms
 Vref = linspace(V1-0.01,V2+0.01,N);
 Phref = (R*Th/(V1-0.01))*((V1-0.01)^n)./Vref.^n;
 Pcref = (R*Tc/(V1-0.01))*((V1-0.01)^n)./Vref.^n;
-plot(Vref,Phref,'r--')
-plot(Vref,Pcref,'b--')
+plot(Vref,Phref/1000,'r--')
+plot(Vref,Pcref/1000,'b--')
 % text labels
-text(V1,P1,'1  ','HorizontalAlignment','right')
-text(V2,P2,'  2','HorizontalAlignment','left')
-text(V3,P3,'  3','HorizontalAlignment','left')
-text(V4,P4,'4  ','HorizontalAlignment','right')
-text(V(N/2),Ph(N/2),{'T_h',' ',' '},'HorizontalAlignment','center','Color','r')
-text(V(N/2),Pc(N/2),{' ',' ','T_c'},'HorizontalAlignment','center','Color','b')
+text(V1,P1/1000,'1  ','HorizontalAlignment','right')
+text(V2,P2/1000,'  2','HorizontalAlignment','left')
+text(V3,P3/1000,'  3','HorizontalAlignment','left')
+text(V4,P4/1000,'4  ','HorizontalAlignment','right')
+text(V(N/2),Ph(N/2)/1000,{'T_h',' ',' '},'HorizontalAlignment','center','Color','r')
+text(V(N/2),Pc(N/2)/1000,{' ',' ','T_c'},'HorizontalAlignment','center','Color','b')
 % Arduino data
-plot(Vmeas,Pmeas,'-g')
+plot(Vmeas,Pmeas/1000,'-g')
 xlabel('Volume [m^3/kg]')
-ylabel('Pressure [Pa]')
+ylabel('Pressure [kPa]')
 axis('padded');
 
 function readData(src,~)

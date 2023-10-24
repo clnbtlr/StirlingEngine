@@ -12,9 +12,16 @@ close all
 % % save arduinoData1.mat Pmeas Vmeas
 
 load arduinoData.mat % values from MPXV7002
-figure; hold on;
-plot(Pmeas,'-m')
-plot(Vmeas,'-b')
+figure; hold on; box on;
+title('Arduino data')
+t = (1:length(Pmeas))*12e-3; % Arduino "loop" takes ~ 12 millisecond
+yyaxis left
+plot(t,Pmeas,'-')
+ylabel('Gauge Pressure [kPa]')
+yyaxis right
+plot(t,Vmeas,'-')
+ylabel('\DeltaV [cm^3]')
+xlabel('time [s]')
 legend('Pressure','Volume')
 load arduinoData1.mat % values from PSE533
 Pmeas = Pmeas*1000 + 101000; % pressure values from arduino [Pa]
@@ -22,9 +29,11 @@ Pmeas = Pmeas*1000 + 101000; % pressure values from arduino [Pa]
 %% calculate ideal Stirling cycle
 
 % Temperature conditions
-Th = 90 + 273.15; % heat source temperature [K]
-Tc = 20 + 273.15; % heat sink temperature [K]
+Th = 90 + 273.15; % heat source temperature [K] % 31.5
+Tc = 20 + 273.15; % heat sink temperature [K] % 27
 R = 287; % Gas constant for air [J/kg.K]
+cp = 1004; % specific heat capacity at constant pressure [J/kg.K]
+cv = cp - R; % specific heat capacity at constant volume [J/kg.K]
 
 % Engine geometry
 D = 90e-3; % diameter of large cylinder [m]
@@ -54,26 +63,49 @@ P1 = R*Th/V1;
 P2 = R*Th/V2;
 V = linspace(V1,V2,N);
 Ph = (P1*V1^n)./V.^n;
+S12_1 = 0; %***need to define reference value***
+for i = 2:length(Ph)
+    S12_1(i) = R*log(Ph(i-1)/Ph(i));
+    % S12(i) = refpropm('S','T',Th,'P',Ph(i)/1000,'air.ppf');
+end
+S12_1 = cumsum(S12_1);
 
 % Process 2-3: Constant Volume Heat Removal
 V3 = V2;
 P3 = R*Tc/V3;
+T = linspace(Th,Tc,N);
+S23 = S12_1(end);
+for i = 2:length(T)
+    S23(i) = real(cv*log(T(i)/T(i-1)));
+end
+S23 = cumsum(S23);
 
 % Process 3-4: Isothermal Heat Removal
 V4 = V1;
 P4 = R*Tc/V4;
 Pc = (P4*V4^n)./V.^n;
+S34 = S23(end);
+for i = length(Pc):-1:2
+    S34(i) = R*log(Pc(i)/Pc(i-1));
+end
+S34 = cumsum(S34);
 
 % Process 4-1: Constant Volume Heat Addition
-% nothing to calculate as know all values already.
+S14 = S12_1(1);
+for i = 2:length(T)
+    S41(i) = real(cv*log(T(i)/T(i-1)));
+end
+S41 = cumsum(S41);
 
-figure; hold on;
+figure; hold on; box on;
+title('P-V diagram of Arduino data');
 plot(Vmeas,Pmeas/1000,'-g')
 xlabel('Volume [m^3/kg]')
 ylabel('Pressure [kPa]')
 axis('padded');
 
 figure; hold on; box on;
+title('P-V diagram');
 plot(V,Ph/1000,'r')
 plot([V2,V3],[P2,P3]/1000,'-ok','MarkerFaceColor','k')
 plot(V,Pc/1000,'-b')
@@ -100,6 +132,17 @@ text(V(N/2),Pc(N/2)/1000,{' ',' ','T_c'},'HorizontalAlignment','center','Color',
 plot(Vmeas,Pmeas/1000,'-g')
 xlabel('Volume [m^3/kg]')
 ylabel('Pressure [kPa]')
+axis('padded');
+
+figure; hold on; box on;
+title('T-s diagram');
+% plot(S12(2:end),Th*ones(length(S12)-1)-273.15,'r-')
+plot(S12_1,Th*ones(length(S12_1))-273.15,'r-')
+plot(S23,T-273.15,'k-')
+plot(S34,Tc*ones(length(S34))-273.15,'b-')
+plot(S41,T-273.15,'k-')
+xlabel('Entropy [J/kg.K]')
+ylabel('Temperature [^\circC]')
 axis('padded');
 
 function readData(src,~)

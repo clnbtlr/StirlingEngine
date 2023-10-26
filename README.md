@@ -1,4 +1,11 @@
 # StirlingEngine
 
 Zero position needs to be set correctly so during operation, the measured angle increases.
+
+Front view:
+
+![IMG_6112](https://github.com/clnbtlr/StirlingEngine/assets/125999934/b0d3bbcf-f4f2-4d93-a137-077eb4bfe103)
  
+Top view:
+
+<img src="https://github.com/clnbtlr/StirlingEngine/assets/125999934/71b0a3bb-8168-4625-a069-147d9969ebae" width="533">

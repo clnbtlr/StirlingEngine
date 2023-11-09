@@ -29,8 +29,8 @@ Pmeas = Pmeas*1000 + 101000; % pressure values from arduino [Pa]
 %% calculate ideal Stirling cycle
 
 % Temperature conditions
-Th = 90 + 273.15; % heat source temperature [K] % 31.5
-Tc = 20 + 273.15; % heat sink temperature [K] % 27
+Th = 90 + 273.15; % heat source temperature [K] % 30.45
+Tc = 25 + 273.15; % heat sink temperature [K] % 27.2
 R = 287; % Gas constant for air [J/kg.K]
 cp = 1004; % specific heat capacity at constant pressure [J/kg.K]
 cv = cp - R; % specific heat capacity at constant volume [J/kg.K]
@@ -63,18 +63,17 @@ P1 = R*Th/V1;
 P2 = R*Th/V2;
 V = linspace(V1,V2,N);
 Ph = (P1*V1^n)./V.^n;
-S12_1 = 0; %***need to define reference value***
+S12 = refpropm('S','T',Th,'P',P1/1000,'air.ppf'); % [J/kg.K]
 for i = 2:length(Ph)
-    S12_1(i) = R*log(Ph(i-1)/Ph(i));
-    % S12(i) = refpropm('S','T',Th,'P',Ph(i)/1000,'air.ppf');
+    S12(i) = R*log(Ph(i-1)/Ph(i));
 end
-S12_1 = cumsum(S12_1);
+S12 = cumsum(S12);
 
 % Process 2-3: Constant Volume Heat Removal
 V3 = V2;
 P3 = R*Tc/V3;
 T = linspace(Th,Tc,N);
-S23 = S12_1(end);
+S23 = S12(end);
 for i = 2:length(T)
     S23(i) = real(cv*log(T(i)/T(i-1)));
 end
@@ -91,18 +90,11 @@ end
 S34 = cumsum(S34);
 
 % Process 4-1: Constant Volume Heat Addition
-S14 = S12_1(1);
+S41 = S12(1);
 for i = 2:length(T)
     S41(i) = real(cv*log(T(i)/T(i-1)));
 end
 S41 = cumsum(S41);
-
-figure; hold on; box on;
-title('P-V diagram of Arduino data');
-plot(Vmeas,Pmeas/1000,'-g')
-xlabel('Volume [m^3/kg]')
-ylabel('Pressure [kPa]')
-axis('padded');
 
 figure; hold on; box on;
 title('P-V diagram');
@@ -116,9 +108,9 @@ plot(V2,(P2+P3)/2/1000,'vk','MarkerFaceColor','k')
 plot(V(N/2),Pc(N/2)/1000,'<b','MarkerFaceColor','b')
 plot(V1,(P1+P4)/2/1000,'^k','MarkerFaceColor','k')
 % isotherms
-Vref = linspace(V1-0.01,V2+0.01,N);
-Phref = (R*Th/(V1-0.01))*((V1-0.01)^n)./Vref.^n;
-Pcref = (R*Tc/(V1-0.01))*((V1-0.01)^n)./Vref.^n;
+Vref = linspace(V1*0.99,V2*1.01,N);
+Phref = (R*Th/(Vref(1)))*((Vref(1))^n)./Vref.^n;
+Pcref = (R*Tc/(Vref(1)))*((Vref(1))^n)./Vref.^n;
 plot(Vref,Phref/1000,'r--')
 plot(Vref,Pcref/1000,'b--')
 % text labels
@@ -136,15 +128,85 @@ axis('padded');
 
 figure; hold on; box on;
 title('T-s diagram');
-% plot(S12(2:end),Th*ones(length(S12)-1)-273.15,'r-')
-plot(S12_1,Th*ones(length(S12_1))-273.15,'r-')
+plot([S12(1),S12(end)],[Th,Th]-273.15,'r-o','MarkerFaceColor','k','MarkerEdgeColor','k')
 plot(S23,T-273.15,'k-')
-plot(S34,Tc*ones(length(S34))-273.15,'b-')
+plot([S34(1),S34(end)],[Tc,Tc]-273.15,'b-o','MarkerFaceColor','k','MarkerEdgeColor','k')
 plot(S41,T-273.15,'k-')
+% arrows
+plot(S12(N/2),Th-273.15,'>r','MarkerFaceColor','r')
+plot(S23(N/2),(Th+Tc)/2-273.15,'vk','MarkerFaceColor','k')
+plot(S34(N/2),Tc-273.15,'<b','MarkerFaceColor','b')
+plot(S41(N/2),(Th+Tc)/2-273.15,'^k','MarkerFaceColor','k')
+% text labels
+text(S12(1),Th-273.15,'1  ','HorizontalAlignment','right')
+text(S23(1),Th-273.15,'  2','HorizontalAlignment','left')
+text(S34(1),Tc-273.15,'  3','HorizontalAlignment','left')
+text(S41(end),Tc-273.15,'4  ','HorizontalAlignment','right')
+text(S12(N/2),Th-273.15,{'T_h',' ',' '},'HorizontalAlignment','center','Color','r')
+text(S34(N/2),Tc-273.15,{' ',' ','T_c'},'HorizontalAlignment','center','Color','b')
+% Arduino data
+for i = 1:length(Vmeas)
+    Tmeas(i) = Pmeas(i)*Vmeas(i)/R; % ideal gas law
+    % For s, uses relation for polytopic process between Th and Tmeas(i). 
+    % Equation for polytropic index is: ln(P1/P2)/ln(V2/V1).
+    Smeas(i) = log(Tmeas(i)/Th)*(cv+R/(1+(log(Pmeas(i)/P1)/log(V1/Vmeas(i))))) + S12(end);
+end
+plot(Smeas,Tmeas-273.15,'-g')
 xlabel('Entropy [J/kg.K]')
 ylabel('Temperature [^\circC]')
 axis('padded');
 
+%% calculate Work in 1 cycle
+% find minimum boundary of arduino data
+k = boundary(Vmeas',Pmeas');
+Work = polyarea(Pmeas(k),Vmeas(k)); % [J/kg] area inside boundary
+Work = Work*m; % [J]
+
+% find cycle period
+[~,idx]=findpeaks(Pmeas); 
+for i = 1:length(idx)-1
+    tp(i)=t(idx(i+1))-t(idx(i));
+end
+Freq = 1/mean(tp); % cycle frequency [Hz]
+Power = Work*Freq; % [W]
+
+figure; hold on; box on;
+title('P-V diagram of Arduino data');
+plot(Vmeas,Pmeas/1000,'og')
+xlabel('Volume [m^3/kg]')
+ylabel('Pressure [kPa]')
+axis('padded');
+% plot(Vmeas(k),Pmeas(k)/1000,'-m')
+
+%% calculate Heat input in 1 cycle
+% find minimum boundary of arduino data
+k = boundary(Smeas',Tmeas');
+Qnet = polyarea(Smeas(k),Tmeas(k)); % [J/kg] area inside boundary
+Qnet = Qnet*m; % [J]
+
+% To calculate Qh, form a convex hull around data points and two points at
+% Smeas[min,max] and T = 0 K. 
+Smeas2 = [Smeas';min(Smeas);max(Smeas)];
+Tmeas2 = [Tmeas';0;0];
+k2 = boundary(Smeas2,Tmeas2,0); % convex hull.
+Qh = polyarea(Smeas2(k2),Tmeas2(k2)); % [J/kg] area inside boundary
+Qh = Qh*m; % [J]
+
+figure; hold on; box on;
+title('T-s diagram of Arduino data');
+plot(Smeas,Tmeas-273.15,'og')
+xlabel('Entropy [J/kg.K]')
+ylabel('Temperature [^\circC]')
+axis('padded');
+% plot(Smeas2(k2),Tmeas2(k2)-273.15,'-m')
+
+%% Calculate efficiencies
+% Carnot efficiency
+eta_c = (1-(Tc/Th))*100 % [%]
+% Actual efficiency
+eta_a = Work/Qh*100 % [%]
+
+%%
 function readData(src,~)
 
     data = readline(src);

@@ -23,14 +23,14 @@ plot(t,Vmeas,'-')
 ylabel('\DeltaV [cm^3]')
 xlabel('time [s]')
 legend('Pressure','Volume')
-load arduinoData1.mat % values from PSE533
-Pmeas = Pmeas*1000 + 101000; % pressure values from arduino [Pa]
+% load arduinoData1.mat % values from PSE533
+Pmeas = Pmeas*1000 + 101300; % pressure values from arduino [Pa]
 
-%% calculate ideal Stirling cycle
+%% Temperature conditions and engine geometry
 
 % Temperature conditions
-Th = 90 + 273.15; % heat source temperature [K] % 30.45
-Tc = 25 + 273.15; % heat sink temperature [K] % 27.2
+Th = 90 + 273.15; % heat source temperature at hot water temperature [K]
+Tc = 18 + 273.15; % heat sink temperature at ambient [K]
 R = 287; % Gas constant for air [J/kg.K]
 cp = 1004; % specific heat capacity at constant pressure [J/kg.K]
 cv = cp - R; % specific heat capacity at constant volume [J/kg.K]
@@ -56,14 +56,24 @@ V1 = v1/m; % specific volume at V1 [m3/kg]
 V2 = v2/m; % specific volume at V2 [m3/kg]
 Vmeas = ((Vmeas*1e-6) + v1 + 0.5*pi/4*d^2*h)/m; % pressure values from arduino [m3/kg]
 
+figure; hold on; box on;
+title('P-V diagram of Arduino data');
+plot(Vmeas,Pmeas/1000,'og')
+xlabel('Volume [m^3/kg]')
+ylabel('Pressure [kPa]')
+axis('padded');
+% plot(Vmeas(k),Pmeas(k)/1000,'-m')
+
+%% calculate ideal Stirling cycle
 N = 100; % number of points 
+
 % Process 1-2: Isothermal Heat Addition
 n = 1; % polytropic index
 P1 = R*Th/V1;
 P2 = R*Th/V2;
 V = linspace(V1,V2,N);
 Ph = (P1*V1^n)./V.^n;
-S12 = refpropm('S','T',Th,'P',P1/1000,'air.ppf'); % [J/kg.K]
+S12 = 4.0186e+03; %refpropm('S','T',Th,'P',P1/1000,'air.ppf'); % [J/kg.K]
 for i = 2:length(Ph)
     S12(i) = R*log(Ph(i-1)/Ph(i));
 end
@@ -160,7 +170,7 @@ axis('padded');
 % find minimum boundary of arduino data
 k = boundary(Vmeas',Pmeas');
 Work = polyarea(Pmeas(k),Vmeas(k)); % [J/kg] area inside boundary
-Work = Work*m; % [J]
+Work = Work*m % [J]
 
 % find cycle period
 [~,idx]=findpeaks(Pmeas); 
@@ -168,15 +178,7 @@ for i = 1:length(idx)-1
     tp(i)=t(idx(i+1))-t(idx(i));
 end
 Freq = 1/mean(tp); % cycle frequency [Hz]
-Power = Work*Freq; % [W]
-
-figure; hold on; box on;
-title('P-V diagram of Arduino data');
-plot(Vmeas,Pmeas/1000,'og')
-xlabel('Volume [m^3/kg]')
-ylabel('Pressure [kPa]')
-axis('padded');
-% plot(Vmeas(k),Pmeas(k)/1000,'-m')
+Power = Work*Freq % [W]
 
 %% calculate Heat input in 1 cycle
 % find minimum boundary of arduino data

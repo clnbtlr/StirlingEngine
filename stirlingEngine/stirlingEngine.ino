@@ -12,7 +12,7 @@ Pinout:
   MO <-> SDI
   SS <-> CS
 
-  MPXV7025GC6U:
+  MPXV7002DPT1:
   5V <-> VS
   GND <-> GND
   A5 <-> VOUT

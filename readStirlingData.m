@@ -39,7 +39,7 @@ ylabel('\DeltaV [cm^3]')
 xlabel('time [s]')
 legend('Pressure','Volume')
 % load arduinoData1.mat % data from PSE533
-Pmeas = Pmeas*1000 + 101300; % pressure values from arduino [Pa]
+Pmeas = Pmeas*1000 + 101000; % pressure values from arduino [Pa]
 
 %% Temperature conditions and engine geometry
 

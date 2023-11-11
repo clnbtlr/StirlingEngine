@@ -37,7 +37,7 @@ In addition, some small 3d-printed PLA parts were used. The stl files are includ
 
 The pressure sensor was soldered to the perma-proto board such that pin 2 (Vs) and pin 3 (GND) are along the positive and negative power rails. 7 male header pins were soldered in row 3, columns 0-6. Jumper wires were then soldered in place to connect the pressure sensor pins and angle 3 breakout board to the header pins, as shown in the front view photo.
 
-The Pinout for the connections is as follows: 
+The pinout for the connections is as follows: 
 
 | Arduino micro            | Angle 3 click/AK7451 | MPXV7002DPT1 | Perma-Proto pin |
 | ------------------------ | -------------------- | ------------ | --------------- |
@@ -49,7 +49,7 @@ The Pinout for the connections is as follows:
 | SS   | CS  | -    | 6 |
 | A5   | -   | Vout | 0 |
 
-A M5 hole was drilled and taped into the top plate of the engine and the pneumatiuc adapter with gasket was screwed in place.
+A M5 hole was drilled and taped into the top plate of the engine and the pneumatic adapter with gasket was screwed in place.
 
 The MagnetHolder 3d-printed part acts as a bushing between the ring magnet and the shaft of the flywheel. The magnet was glued onto the 3d-printed part before being pushed onto the shaft up to the cam. See top view photo. No glue was used as the PLA part is intended to be a tight fit.
 

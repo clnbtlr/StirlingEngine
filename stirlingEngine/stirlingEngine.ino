@@ -1,5 +1,6 @@
 /* Stirling Engine Pressure and Volume measurement. 
-CButler. Oct 2023.
+clnbtlr
+Oct 2023
 
 Using Arduino Micro as MCB as sensors require 5V.
 Pinout:
@@ -24,7 +25,7 @@ AK7451  ak7451;
 int r = 4; // offset distance between axis and crank [mm]
 int L = 40; // crank arm length [mm]
 float A = PI/4.0*sq(16.0); // piston cross sectional area [mm2]
-float zeroPos = 123.0;//237.0; // angle reading corresponding to highest point of piston [deg]
+float zeroPos = 123.0; // angle reading corresponding to highest point of piston [deg]
 int pressurePin = A5; // analog input pin for pressure sensor
 
 void setup() {

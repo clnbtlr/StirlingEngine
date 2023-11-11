@@ -1,7 +1,22 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Matlab script to read in pressure and volume data from Arduino and 
+% calculate ideal and actual Stirling cycle P-V and T-s curves, work, heat
+% and efficiencies.
+% 
+% 11/11/2023.
+%
+% MIT License
+% Copyright (c) 2023 clnbtlr
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 clear;
 close all
 
 %% Read serial data from Arduino Micro
+% The data can be either read directly from the arduino or imported from
+% mat files. 
+% Uncomment the corresponding lines to do either.
+
 % https://uk.mathworks.com/help/instrument/read-streaming-data-from-arduino.html
 
 % arduinoObj = serialport("COM3",19200);
@@ -11,7 +26,7 @@ close all
 % configureCallback(arduinoObj,"terminator",@readData);
 % % save arduinoData1.mat Pmeas Vmeas
 
-load arduinoData.mat % values from MPXV7002
+load arduinoData.mat % data from MPXV7002
 figure; hold on; box on;
 title('Arduino data')
 t = (1:length(Pmeas))*12e-3; % Arduino "loop" takes ~ 12 millisecond
@@ -23,7 +38,7 @@ plot(t,Vmeas,'-')
 ylabel('\DeltaV [cm^3]')
 xlabel('time [s]')
 legend('Pressure','Volume')
-% load arduinoData1.mat % values from PSE533
+% load arduinoData1.mat % data from PSE533
 Pmeas = Pmeas*1000 + 101300; % pressure values from arduino [Pa]
 
 %% Temperature conditions and engine geometry

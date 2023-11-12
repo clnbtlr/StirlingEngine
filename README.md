@@ -4,11 +4,11 @@ Repository for the thermodynamic analysis of desktop Stirling engine. An Arduino
 
 Front view:
 
-![IMG_6112](https://github.com/clnbtlr/StirlingEngine/assets/125999934/b0d3bbcf-f4f2-4d93-a137-077eb4bfe103)
+![IMG_6112](https://github.com/clnbtlr/StirlingEngine/assets/125999934/bef33b03-5e65-4e45-9719-e4918d13ad80)
  
 Top view:
 
-<img src="https://github.com/clnbtlr/StirlingEngine/assets/125999934/71b0a3bb-8168-4625-a069-147d9969ebae" width="533">
+<img src="[https://github.com/clnbtlr/StirlingEngine/assets/125999934/6fcb5f76-51c4-4008-ad09-8e818c84a938]" width="533">
 
 ## Bill of Materials
 

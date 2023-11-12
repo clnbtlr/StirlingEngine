@@ -8,9 +8,7 @@ Front view:
  
 Top view:
 
-![IMG_6122](https://github.com/clnbtlr/StirlingEngine/assets/125999934/8cee5f7d-918d-4c88-9cce-4c89020e86bc)
-
-<img src="[https://github.com/clnbtlr/StirlingEngine/assets/125999934/8cee5f7d-918d-4c88-9cce-4c89020e86bc]" width="533">
+<img src="https://github.com/clnbtlr/StirlingEngine/assets/125999934/8cee5f7d-918d-4c88-9cce-4c89020e86bc" width="533">
 
 ## Bill of Materials
 

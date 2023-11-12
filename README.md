@@ -1,6 +1,6 @@
 # StirlingEngine
 
-Repository for the thermodynamic analysis of desktop stirling engine. An Arduino micro is used to measure the engines internal pressure and flywheel angle. This data is then imported into matlab to determine the heat, work and thermal efficiency. This project is intended as a low-cost demonstration of the different thermodynamic processes in an actual heat engine for undergraduate mechanical engineering students.
+Repository for the thermodynamic analysis of desktop Stirling engine. An Arduino micro is used to measure the engines internal pressure and flywheel angle. This data is then imported into matlab to determine the heat, work and thermal efficiency. This project is intended as a low-cost demonstration of the different thermodynamic processes in an actual heat engine for undergraduate mechanical engineering students.
 
 Front view:
 
@@ -61,13 +61,13 @@ Connect the Ø 4 mm pneumatic tubing to the MPXV7002DPT1 pressure sensor port cl
 
 The zero position of the angle sensor needs to be set correctly so that during operation, the measured angle increases. The zero position is the angle reading corresponding to the highest point of piston in degrees. It will vary based on how the magnet was assembled to the flywheel shaft. Using the Arduino IDE, uncomment the Serial.print(angle) line in the stirlingEngine.ino sketch and upload it to the Arduino micro.
 
-Slowly rotate the flywheel by hand until the piston is at its maximum height, read the angle value in the Serial monitor and then update the zeroPos variable in the sketch. The Serial.print(angle) line can be commented out now again. Update the geometric variables in the script if necessary for a different model of stirling engine. Upload the updated sketch to the Arduino micro again.
+Slowly rotate the flywheel by hand until the piston is at its maximum height, read the angle value in the Serial monitor and then update the zeroPos variable in the sketch. The Serial.print(angle) line can be commented out now again. Update the geometric variables in the script if necessary for a different model of Stirling engine. Upload the updated sketch to the Arduino micro again.
 
 The real-time values for the pressure and volume can now be monitored in the Serial Plotter window.
 
 ## Running a test
 
-Fill a mug with hot water from a kettle. Measure its temperature (i.e. the hot reservoir temperature) using a thermometer/thermistor/thermocouple. Measure ambient temperature (i.e. the cold reservoir temperature). Place the stirling engine on top of the mug and wait a few minutes for the hot plate to heat up. Then by hand, spin the flywheel and it should start running freely. Direction of rotation is clockwise in the photos above.
+Fill a mug with hot water from a kettle. Measure its temperature (i.e. the hot reservoir temperature) using a thermometer/thermistor/thermocouple. Measure ambient temperature (i.e. the cold reservoir temperature). Place the Stirling engine on top of the mug and wait a few minutes for the hot plate to heat up. Then by hand, spin the flywheel and it should start running freely. Direction of rotation is clockwise in the photos above.
 
 The almost sinusodial change in pressure and volume over time should be observed in the Ardunio IDE serial plotter window. The pressure signal leads the volume signal.
 
@@ -84,8 +84,14 @@ The PSE533 pressure sensor was used to compare/check the values from the MPXV700
 
 The matlab script first plots the time series data from the arduino similar to the Arduino IDE serial plotter, as shown below.
 
+![arduinoTimeSeries](https://github.com/clnbtlr/StirlingEngine/assets/125999934/8aed6754-c6c8-44f9-8be5-1daca92a9b72)
+
 It then presents this data as a P-V diagram, with the values for pressure converted from gauge to absolute pressure, and the volume converted from dV to specific volume.
 
-The ideal stirling cycle P-V diagram is calculated using the different thermodynamic process relationships and from the measured hot and cold reservoir temperatures and the min. and max. specific volumes. Both the ideal and measured P-v data is plotted and the results show that the actual engine is doing much less net work than the actual cycle due to inefficiencies/irreversibilities.
+![arduinoPV](https://github.com/clnbtlr/StirlingEngine/assets/125999934/bc720012-c45c-4cde-8802-5d7d64552c5d)
 
-The ideal stirling cycle T-s diagram is calculated, again using the different thermodynamic process relationships, and the measured P-V data is recalculated into T and s. The values for heat, work and thermal efficiencies are calculated and output to the console. The ideal Carnot efficiency was found to be ~19% while the actual efficiency was ~0.4%.
+The ideal Stirling cycle P-V diagram is calculated using the different thermodynamic process relationships and from the measured hot and cold reservoir temperatures and the min. and max. specific volumes. Both the ideal and measured P-v data is plotted and the results show that the actual engine is doing much less net work than the actual cycle due to inefficiencies/irreversibilities.
+
+![idealPV](https://github.com/clnbtlr/StirlingEngine/assets/125999934/52bbb663-6d66-4f77-8721-05333a46ee9d)
+
+The ideal Stirling cycle T-s diagram is calculated, again using the different thermodynamic process relationships, and the measured P-V data is recalculated into T and s. The values for heat, work and thermal efficiencies are calculated and output to the console. The ideal Carnot efficiency was found to be ~19% while the actual efficiency was ~0.4%.

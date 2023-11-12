@@ -8,7 +8,9 @@ Front view:
  
 Top view:
 
-<img src="[https://github.com/clnbtlr/StirlingEngine/assets/125999934/6fcb5f76-51c4-4008-ad09-8e818c84a938]" width="533">
+![IMG_6122](https://github.com/clnbtlr/StirlingEngine/assets/125999934/8cee5f7d-918d-4c88-9cce-4c89020e86bc)
+
+<img src="[https://github.com/clnbtlr/StirlingEngine/assets/125999934/8cee5f7d-918d-4c88-9cce-4c89020e86bc]" width="533">
 
 ## Bill of Materials
 
@@ -84,14 +86,14 @@ The PSE533 pressure sensor was used to compare/check the values from the MPXV700
 
 The matlab script first plots the time series data from the arduino similar to the Arduino IDE serial plotter, as shown below.
 
-![arduinoTimeSeries](https://github.com/clnbtlr/StirlingEngine/assets/125999934/8aed6754-c6c8-44f9-8be5-1daca92a9b72)
+![arduinoTimeSeries](https://github.com/clnbtlr/StirlingEngine/assets/125999934/20863079-eebc-4929-96e2-a810f1c1fff0)
 
 It then presents this data as a P-V diagram, with the values for pressure converted from gauge to absolute pressure, and the volume converted from dV to specific volume.
 
-![arduinoPV](https://github.com/clnbtlr/StirlingEngine/assets/125999934/bc720012-c45c-4cde-8802-5d7d64552c5d)
+![arduinoPV](https://github.com/clnbtlr/StirlingEngine/assets/125999934/ee069ec3-10b8-4172-a06b-04beb92e5dee)
 
 The ideal Stirling cycle P-V diagram is calculated using the different thermodynamic process relationships and from the measured hot and cold reservoir temperatures and the min. and max. specific volumes. Both the ideal and measured P-v data is plotted and the results show that the actual engine is doing much less net work than the actual cycle due to inefficiencies/irreversibilities.
 
-![idealPV](https://github.com/clnbtlr/StirlingEngine/assets/125999934/52bbb663-6d66-4f77-8721-05333a46ee9d)
+![idealPV](https://github.com/clnbtlr/StirlingEngine/assets/125999934/fc2a1bdd-23ac-4596-ae44-eb3dec6cc750)
 
 The ideal Stirling cycle T-s diagram is calculated, again using the different thermodynamic process relationships, and the measured P-V data is recalculated into T and s. The values for heat, work and thermal efficiencies are calculated and output to the console. The ideal Carnot efficiency was found to be ~19% while the actual efficiency was ~0.4%.

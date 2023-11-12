@@ -1,6 +1,6 @@
 # StirlingEngine
 
-Repository for the thermodynamic analysis of desktop Stirling engine. An Arduino micro is used to measure the engines internal pressure and flywheel angle. This data is then imported into matlab to determine the heat, work and thermal efficiency. This project is intended as a low-cost demonstration of the different thermodynamic processes in an actual heat engine for undergraduate mechanical engineering students.
+Repository for the thermodynamic analysis of desktop Stirling engine. An Arduino micro is used to measure the engines internal pressure and flywheel angle. This data is then imported into matlab to determine the heat, work and thermal efficiency. This project is intended as a low-cost demonstration of the different thermodynamic processes in an actual heat engine for physics or engineering students.
 
 Front view:
 

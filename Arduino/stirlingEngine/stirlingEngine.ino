@@ -33,7 +33,7 @@ void setup() {
   while(!Serial){ // wait for serial port
     delay(1);
   }
-  Serial.println("***Reset***");
+  //Serial.println("***Reset***");
   ak7451.begin(SS); // SS pin on Arduino Micro but can be any other Digital I/O Pin
 }
 

@@ -39,7 +39,6 @@ ylabel('\DeltaV [cm^3]')
 xlabel('time [s]')
 legend('Pressure','Volume')
 % load arduinoData1.mat % data from PSE533
-Pmeas = Pmeas*1000 + 101000; % pressure values from arduino [Pa]
 
 %% Temperature conditions and engine geometry
 
@@ -67,10 +66,11 @@ v2 = v1 + pi/4*d^2*h; % [m3]
 % position, pressure and temperature will be at atmospheric. Can then use
 % the reference specfic volume at that point to caluclate mass of air
 % inside when resealed at these conditions.
-m = 101000*(v1)/R/(20+273.15);
+m = 101325*(v1)/R/(Tc);
 V1 = v1/m; % specific volume at V1 [m3/kg]
 V2 = v2/m; % specific volume at V2 [m3/kg]
 Vmeas = ((Vmeas*1e-6) + v1 + 0.5*pi/4*d^2*h)/m; % volume values from arduino [m3/kg]
+Pmeas = Pmeas*1000 + 101325; % pressure values from arduino [Pa]
 
 figure; hold on; box on;
 title('P-V diagram of Arduino data');

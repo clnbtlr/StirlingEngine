@@ -3,10 +3,10 @@
 % calculate ideal and actual Stirling cycle P-V and T-s curves, work, heat
 % and efficiencies.
 % 
-% 11/11/2023.
+% 28/04/2024.
 %
 % MIT License
-% Copyright (c) 2023 clnbtlr
+% Copyright (c) 2024 clnbtlr
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clear;
@@ -49,15 +49,16 @@ Tc = 18 + 273.15; % heat sink temperature at ambient [K]
 R = 287; % Gas constant for air [J/kg.K]
 cp = 1004; % specific heat capacity at constant pressure [J/kg.K]
 cv = cp - R; % specific heat capacity at constant volume [J/kg.K]
+Patm = 101325; % atmospheric pressure [Pa]
 
 % Engine geometry
 D = 90e-3; % diameter of large cylinder [m]
 H = 20e-3; % height of large cylinder [m]
-D_disp = D - 2*5e-3; % estm. diameter of displacer
-H_disp = 8e-3; % estm. height of displacer
+D_disp = D - 2*5e-3; % estm. diameter of displacer [m]
+H_disp = 8e-3; % estm. height of displacer [m]
 porosity = 0.9; % porosity of polyurethane foam
-d = 16e-3; % diameter of piston; included in "A" in Arduino sketch
-h = 2*4e-3; % total stroke length of piston; corresponds to "r" in Arduino sketch
+d = 16e-3; % diameter of piston [m]; included in "A" in Arduino sketch
+h = 2*4e-3; % total stroke length of piston [m]; corresponds to "r" in Arduino sketch
 v1 = pi/4*D^2*H - (1-porosity)*pi/4*D_disp^2*H_disp; % [m3]
 v2 = v1 + pi/4*d^2*h; % [m3]
 
@@ -69,7 +70,7 @@ v2 = v1 + pi/4*d^2*h; % [m3]
 m = 101000*(v1)/R/(20+273.15);
 V1 = v1/m; % specific volume at V1 [m3/kg]
 V2 = v2/m; % specific volume at V2 [m3/kg]
-Vmeas = ((Vmeas*1e-6) + v1 + 0.5*pi/4*d^2*h)/m; % pressure values from arduino [m3/kg]
+Vmeas = ((Vmeas*1e-6) + v1 + 0.5*pi/4*d^2*h)/m; % volume values from arduino [m3/kg]
 
 figure; hold on; box on;
 title('P-V diagram of Arduino data');
@@ -77,7 +78,6 @@ plot(Vmeas,Pmeas/1000,'og')
 xlabel('Volume [m^3/kg]')
 ylabel('Pressure [kPa]')
 axis('padded');
-% plot(Vmeas(k),Pmeas(k)/1000,'-m')
 
 %% calculate ideal Stirling cycle
 N = 100; % number of points 
@@ -153,31 +153,30 @@ axis('padded');
 
 figure; hold on; box on;
 title('T-s diagram');
-plot([S12(1),S12(end)],[Th,Th]-273.15,'r-o','MarkerFaceColor','k','MarkerEdgeColor','k')
-plot(S23,T-273.15,'k-')
-plot([S34(1),S34(end)],[Tc,Tc]-273.15,'b-o','MarkerFaceColor','k','MarkerEdgeColor','k')
-plot(S41,T-273.15,'k-')
+plot([S12(1)/1000,S12(end)/1000],[Th,Th]-273.15,'r-o','MarkerFaceColor','k','MarkerEdgeColor','k')
+plot(S23/1000,T-273.15,'k-')
+plot([S34(1)/1000,S34(end)/1000],[Tc,Tc]-273.15,'b-o','MarkerFaceColor','k','MarkerEdgeColor','k')
+plot(S41/1000,T-273.15,'k-')
 % arrows
-plot(S12(N/2),Th-273.15,'>r','MarkerFaceColor','r')
-plot(S23(N/2),(Th+Tc)/2-273.15,'vk','MarkerFaceColor','k')
-plot(S34(N/2),Tc-273.15,'<b','MarkerFaceColor','b')
-plot(S41(N/2),(Th+Tc)/2-273.15,'^k','MarkerFaceColor','k')
+plot(S12(N/2)/1000,Th-273.15,'>r','MarkerFaceColor','r')
+plot(S23(N/2)/1000,(Th+Tc)/2-273.15,'vk','MarkerFaceColor','k')
+plot(S34(N/2)/1000,Tc-273.15,'<b','MarkerFaceColor','b')
+plot(S41(N/2)/1000,(Th+Tc)/2-273.15,'^k','MarkerFaceColor','k')
 % text labels
-text(S12(1),Th-273.15,'1  ','HorizontalAlignment','right')
-text(S23(1),Th-273.15,'  2','HorizontalAlignment','left')
-text(S34(1),Tc-273.15,'  3','HorizontalAlignment','left')
-text(S41(end),Tc-273.15,'4  ','HorizontalAlignment','right')
-text(S12(N/2),Th-273.15,{'T_h',' ',' '},'HorizontalAlignment','center','Color','r')
-text(S34(N/2),Tc-273.15,{' ',' ','T_c'},'HorizontalAlignment','center','Color','b')
+text(S12(1)/1000,Th-273.15,'1  ','HorizontalAlignment','right')
+text(S23(1)/1000,Th-273.15,'  2','HorizontalAlignment','left')
+text(S34(1)/1000,Tc-273.15,'  3','HorizontalAlignment','left')
+text(S41(end)/1000,Tc-273.15,'4  ','HorizontalAlignment','right')
+text(S12(N/2)/1000,Th-273.15,{'T_h',' ',' '},'HorizontalAlignment','center','Color','r')
+text(S34(N/2)/1000,Tc-273.15,{' ',' ','T_c'},'HorizontalAlignment','center','Color','b')
 % Arduino data
 for i = 1:length(Vmeas)
     Tmeas(i) = Pmeas(i)*Vmeas(i)/R; % ideal gas law
     % For s, uses relation for polytopic process between Th and Tmeas(i). 
-    % Equation for polytropic index is: ln(P1/P2)/ln(V2/V1).
-    Smeas(i) = log(Tmeas(i)/Th)*(cv+R/(1+(log(Pmeas(i)/P1)/log(V1/Vmeas(i))))) + S12(end);
+    Smeas(i) = R*log(Vmeas(i)/V1)-cv*log(Th/Tmeas(i)) + S12(1);
 end
-plot(Smeas,Tmeas-273.15,'-g')
-xlabel('Entropy [J/kg.K]')
+plot(Smeas/1000,Tmeas-273.15,'-g')
+xlabel('Entropy [kJ/kg.K]')
 ylabel('Temperature [^\circC]')
 axis('padded');
 
@@ -211,11 +210,10 @@ Qh = Qh*m; % [J]
 
 figure; hold on; box on;
 title('T-s diagram of Arduino data');
-plot(Smeas,Tmeas-273.15,'og')
-xlabel('Entropy [J/kg.K]')
+plot(Smeas/1000,Tmeas-273.15,'og')
+xlabel('Entropy [kJ/kg.K]')
 ylabel('Temperature [^\circC]')
 axis('padded');
-% plot(Smeas2(k2),Tmeas2(k2)-273.15,'-m')
 
 %% Calculate efficiencies
 % Carnot efficiency

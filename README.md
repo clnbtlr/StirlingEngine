@@ -95,3 +95,6 @@ The ideal Stirling cycle P-V diagram is calculated using the different thermodyn
 ![idealPV](https://github.com/clnbtlr/StirlingEngine/assets/125999934/fc2a1bdd-23ac-4596-ae44-eb3dec6cc750)
 
 The ideal Stirling cycle T-s diagram is calculated, again using the different thermodynamic process relationships, and the measured P-V data is recalculated into T and s. The values for heat, work and thermal efficiencies are calculated and output to the console. The ideal Carnot efficiency was found to be ~19% while the actual efficiency was ~0.4%.
+
+## Data analysis with Python
+The python script readStirlingData.py works in the same fashion as the matlab script. The pressure and volume data from the Arduino is imported from the data.csv file included in the directory. The P-V and T-s values are calculated and followed by plotting of the diagrams. Efficiency results are identical to the matlab results.

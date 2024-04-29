@@ -12,6 +12,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.spatial import ConvexHull
 
 ## Read in Arduino data (using MPXV7002 pressure sensor)
 df = pd.read_csv('data.csv')
@@ -57,8 +58,7 @@ v2 = v1 + np.pi/4*d**2*h # maximum internal volume [m3]
 # position, pressure and temperature will be at atmospheric. Can then use
 # the reference specfic volume at that point to caluclate mass of air
 # inside when resealed at these conditions.
-m = Patm*(v1)/R/Tc
-print(m)
+m = Patm*(v1)/R/Tc # [kg]
 V1 = v1/m # specific volume at V1 [m3/kg]
 V2 = v2/m # specific volume at V2 [m3/kg]
 Vmeas = ((df.Vmeas*1e-6) + v1 + 0.5*np.pi/4*d**2*h)/m # volume values from Arduino [m3/kg]
@@ -66,7 +66,7 @@ Pmeas = df.Pmeas*1000 + Patm # pressure values from Arduino to abs. pressure [Pa
 
 plt.figure()
 plt.title('P-V diagram of Arduino data')
-plt.plot(Vmeas,Pmeas/1000,'.')
+plt.plot(Vmeas,Pmeas/1000,'.g')
 plt.xlabel('Volume,$ν$ [m3/kg]')
 plt.ylabel('Pressure, $P$ [kPa]')
 
@@ -170,5 +170,41 @@ for i in range(0,len(Vmeas)):
     # For s, uses relation for polytropic process between Th and Tmeas[i]
     Smeas[i] = R*np.log(Vmeas[i]/V1) - cv*np.log(Th/Tmeas[i]) + S12[0]
 plt.plot(Smeas/1000,Tmeas-273.15,'-g')
+
+## calculate Work in 1 cycle
+# find minimum boundary of arduino data
+points = np.stack((Vmeas,Pmeas),axis=1)
+hull = ConvexHull(points)
+Work = 0.5*np.abs(np.dot(points[hull.vertices,0],np.roll(points[hull.vertices,1],1))-np.dot(points[hull.vertices,1],np.roll(points[hull.vertices,0],1))) # [J/kg] area inside boundary
+Work = Work*m # [J]
+
+## calculate Heat input in 1 cycle
+# find convex hull of data points and Shoelace formula to calculate its area.
+points = np.stack((Smeas,Tmeas),axis=1)
+hull = ConvexHull(points)
+Qnet = 0.5*np.abs(np.dot(points[hull.vertices,0],np.roll(points[hull.vertices,1],1))-np.dot(points[hull.vertices,1],np.roll(points[hull.vertices,0],1))) # [J/kg] area inside boundary
+Qnet = Qnet*m # [J]
+
+# To calculate Qh, form a convex hull around data points and two points at
+# Smeas[min,max] and T = 0 K.
+Smeas2 = np.concatenate((Smeas,[np.min(Smeas,0)],[np.max(Smeas,0)]),axis=None)
+Tmeas2 = np.concatenate((Tmeas,[0],[0]),axis=None)
+points = np.stack((Smeas2,Tmeas2),axis=1)
+hull = ConvexHull(points)
+Qh = 0.5*np.abs(np.dot(points[hull.vertices,0],np.roll(points[hull.vertices,1],1))-np.dot(points[hull.vertices,1],np.roll(points[hull.vertices,0],1))) # [J/kg] area inside boundary
+Qh = Qh*m # [J]
+
+plt.figure()
+plt.title('T-s diagram of Arduino data')
+plt.plot(Smeas/1000,Tmeas-273.15,'.g')
+plt.xlabel('Entropy, $s$ [kJ/kg.K]')
+plt.ylabel('Temperature, $T$ [°C]')
+
+## Calculate efficiencies
+# Carnot efficiency
+eta_c = (1-(Tc/Th))*100 # [%]
+# Actual efficiency
+eta_a = Work/Qh*100 # [%]
+print(eta_c,eta_a)
 
 plt.show()

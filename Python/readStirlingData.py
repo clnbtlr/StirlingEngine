@@ -18,8 +18,6 @@ from scipy.spatial import ConvexHull
 df = pd.read_csv('data.csv')
 
 fig, ax1 = plt.subplots()
-#plt.rcParams["font.family"] = 'Times New Roman'
-#plt.rcParams.update({'font.size': 8})
 plt.title('Arduino data')
 color = 'tab:red'
 ax1.plot(df.t,df.Pmeas,'-',color=color)

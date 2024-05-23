@@ -22,6 +22,15 @@ Pinout:
 #include "ak7451.h"
 AK7451  ak7451;
 
+/*
+The zero position of the angle sensor needs to be set correctly so that during operation, the measured angle increases.
+The zero position is the angle reading corresponding to the highest point of piston in degrees. It will vary based on
+how the magnet was assembled to the flywheel shaft.
+To do this, uncomment the Serial.print(angle) line and upload the sketch to the Arduino micro.
+Slowly rotate the flywheel by hand until the piston is at its maximum height, read the angle value in the Serial
+monitor and then update the zeroPos variable below. The Serial.print(angle) line can be commented out now again.
+Upload the updated sketch to the Arduino micro again.
+*/
 int r = 4; // offset distance between axis and crank [mm]
 int L = 40; // crank arm length [mm]
 float A = PI/4.0*sq(16.0); // piston cross sectional area [mm2]

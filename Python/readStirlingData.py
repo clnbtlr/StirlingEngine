@@ -1,5 +1,5 @@
 ##########################################################################
-# Matlab script to read in pressure and volume data from Arduino and 
+# Python script to read in pressure and volume data from Arduino and 
 # calculate ideal and actual Stirling cycle P-V and T-s curves, work, heat
 # and efficiencies.
 # 
@@ -43,7 +43,7 @@ Patm = 101325 # atmospheric pressure [Pa]
 # Engine geometry
 D = 90e-3 # diameter of large cylinder [m]
 H = 20e-3 # height of large cylinder [m]
-D_disp = D - 2.5e-3 # estm. diameter of displacer [m]
+D_disp = D - 2*5e-3 # estm. diameter of displacer [m]
 H_disp = 8e-3 # estm. height of displacer [m]
 porosity = 0.9 # porosity of polyurethane foam
 d = 16e-3 # diameter of piston [m]; included in "A" in Arduino sketch
